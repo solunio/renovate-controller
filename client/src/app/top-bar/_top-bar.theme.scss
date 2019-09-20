@@ -1,0 +1,42 @@
+@import '~@angular/material/theming';
+
+
+@mixin top-bar-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+
+  .top-bar {
+    background-color: mat-color($primary);
+    
+    h1 {
+      color: map-get($background, card);
+    }
+    h1:hover {
+      color: mat-color($accent);
+    }
+            
+    .switch-button {
+      background-color: map-get($background, card);
+    }        
+
+    a {
+      color: mat-color($primary);
+
+      .config-doc:hover {
+          background-color: mat-color($accent);
+      }
+    }
+
+    .fancy-button {
+      background-color:map-get($background, card);
+      color: mat-color($primary);
+    }
+    .fancy-button i.material-icons{
+      color: mat-color($primary);
+    }
+  }
+
+
+}

@@ -1,0 +1,131 @@
+@import '~jsoneditor/dist/jsoneditor.min.css';
+@import './theme.scss';
+@import './app/app.theme';
+
+.theme {
+  @include angular-material-theme($renovate-controller-theme);
+  @include app-theme($renovate-controller-theme);
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+
+    .imagecontainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+      width: 75%;
+      height: 75%;
+      img {
+        margin: auto;
+        max-height: 100%;
+        max-width: 100%;
+        animation: shake .5s infinite;
+        animation-direction: alternate;
+      }
+    }
+  }
+
+  app-root:empty + .loading {
+    height: 100%;
+    width: 100%;
+
+    opacity: 1;
+    z-index: 100;
+    visibility: visible;
+  }
+
+  app-root:not(:empty) + .loading {
+    animation: hideLoadingScreen 1s ease-in-out;
+  }
+
+  @keyframes hideLoadingScreen {
+    from {
+      opacity: 1;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @keyframes shake {
+    0% {
+      transform: rotate(-15deg);
+    }
+    50% {
+      transform: rotate(15deg);
+    }
+    100% {
+      transform: rotate(-15deg);
+    }
+  }
+}
+
+$background: map-get($renovate-controller-theme, background);
+
+html, body {
+  height: 100%;
+  max-height: 100%;
+  background-color: map-get($background, background);
+  margin: 0;
+}
+
+* {
+  font-family: 'Roboto', Arial, sans-serif;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100%;
+}
+
+h1 {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: bold;
+}
+
+
+/* Hyperlink */
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+  
+a:hover {
+  opacity: 0.8;
+}
+
+
+/* Input */
+
+input {
+  font-size: 14px;
+  border-radius: 2px;
+}
+  
+label {
+  font-size: 16px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  text-transform: uppercase;
+}
+
+.started-snack-bar {
+  background-color: #32cb00!important;
+}
+
+.error-snack-bar {
+  background-color: #f44336!important;
+}

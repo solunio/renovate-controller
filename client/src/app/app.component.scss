@@ -1,0 +1,22 @@
+
+div.maincontainer {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+  @media only screen and (max-width: 500px) {
+    height: auto;
+  }
+  
+  div.topbar-subcontainer {
+    height: fit-content;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  div.subcontainer {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}

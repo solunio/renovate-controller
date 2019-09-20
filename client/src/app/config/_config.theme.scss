@@ -1,0 +1,31 @@
+@import '~@angular/material/theming';
+
+
+@mixin config-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  .config{
+    background-color: map-get($background, background);
+
+    h1 {
+      color: map-get($foreground, text);
+    }
+
+    .tooltip {
+      color: mat-color($accent);
+    }
+
+    mat-toolbar.mat-toolbar.mat-toolbar-single-row {
+      box-shadow: 3px 3px 4px mat-color($primary);
+    }
+
+    button:hover {
+      color: mat-color($accent);
+    }
+      
+  }
+
+}

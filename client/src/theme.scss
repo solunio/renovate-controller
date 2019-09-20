@@ -1,0 +1,9 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$renovate-controller-primary: mat-palette($mat-cyan, 600, 500, 900);
+$renovate-controller-accent: mat-palette($mat-yellow, A400, 900, A100);
+$renovate-controller-warn: mat-palette($mat-red);
+
+$renovate-controller-theme: mat-light-theme($renovate-controller-primary, $renovate-controller-accent, $renovate-controller-warn);

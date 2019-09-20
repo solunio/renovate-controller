@@ -1,0 +1,14 @@
+{
+    "name": "renovate-controller",
+    "version": "1.0.0",
+    "description": "",
+    "author": "",
+    "license": "MIT",
+    "scripts": {
+      "start": "yarn server start:prod",
+      "server": "cd ./server && yarn",
+      "client": "cd ./client && yarn",
+      "build": "yarn server build && yarn client build",
+      "install": "yarn server install && yarn client install"
+    }
+}

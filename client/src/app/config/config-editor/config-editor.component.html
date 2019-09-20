@@ -1,0 +1,1400 @@
+<app-page-actions>
+  <a mat-flat-button href="https://docs.renovatebot.com">
+    <mat-icon>description</mat-icon>
+  </a>
+</app-page-actions>
+
+
+<div class="config">
+  
+  <div class="loading" *ngIf="isLoading">
+    <div class="imagecontainer">
+      <img src="./../../../assets/renovate_controller_bot.png" alt="robot" class="image">
+    </div>
+  </div>
+  
+  <div class="error" *ngIf="isLoading === false && config === undefined">
+    <span style="margin-bottom: 2%; font-weight: bold;">An error occured while loading configuration</span>
+    <span style="margin-bottom: 2%; font-weight: bold;">We're sorry :(</span>
+    <button mat-raised-button color="primary" (click)="reloadConfig()">
+        RETRY
+        <mat-icon>refresh</mat-icon>
+    </button>    
+  </div>
+
+
+  <form class="form" *ngIf="config">
+    <div class="heading1">
+      <mat-icon>settingsapplications</mat-icon>
+      <h1>Renovate configuration</h1>
+    </div>
+  
+    <mat-divider class="divide-header"></mat-divider>
+  
+    <div class="group">
+      <mat-toolbar color="primary">Connection</mat-toolbar>
+      <div class="form-field-group">
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="endpoint"
+            [(ngModel)]="config.endpoint"
+            name="endpoint">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'endpoint')">
+            <mat-icon class="tooltip" matTooltip="Custom endpoint to use">help</mat-icon>
+          </a>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="platform"
+            [(ngModel)]="config.platform"
+            name="platform">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'platform')">
+            <mat-icon class="tooltip" matTooltip="Platform type of repository">help</mat-icon>
+          </a>
+          </mat-form-field>
+          <mat-form-field class="full-width">
+            <input matInput
+            placeholder="username"
+            [(ngModel)]="config.username"
+            name="username">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'username')">
+            <mat-icon class="tooltip" matTooltip="Username for authentication. Currently Bitbucket only">help</mat-icon>
+          </a>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="password"
+            [(ngModel)]="config.password"
+            name="password"
+            type="password">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'password')">
+            <mat-icon class="tooltip" matTooltip="Password for authentication. Currently Bitbucket only (AppPassword).">help</mat-icon>
+          </a>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="token"
+            [(ngModel)]="config.token"
+            name="token">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'token')">
+            <mat-icon class="tooltip" matTooltip="Repository Auth Token">help</mat-icon>
+          </a>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="group">
+      <mat-toolbar color="primary">Files</mat-toolbar>
+      <div class="form-field-group">
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="baseDir"
+            [(ngModel)]="config.baseDir"
+            name="baseDir">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'baseDir')">
+            <mat-icon class="tooltip" matTooltip="The base directory for Renovate to store local files, including repository files and cache. If left empty, Renovate will create its own temporary directory to use.">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-select
+            placeholder="binarySource"
+            [(ngModel)]="config.binarySource"
+            name="binarySource">
+            <mat-option>
+              default
+            </mat-option>
+            <mat-option value="bundled">
+              bundled
+            </mat-option>
+            <mat-option value="global">
+              global
+            </mat-option>
+            <mat-option value="docker">
+              docker
+            </mat-option>
+          </mat-select>
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'binarySource')">
+            <mat-icon class="tooltip" matTooltip="Where to source binaries like npm and yarn from, choices are bundled, global and docker. Set this to global if you wish Renovate to use globally-installed binaries (npm, yarn, etc) instead of using its bundled versions. Set this to docker instead to use docker-based binaries.">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="cacheDir"
+            [(ngModel)]="config.cacheDir"
+            name="cacheDir">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'cacheDir')">
+            <mat-icon class="tooltip" matTooltip="The directory for Renovate for storing caches. If left empty, Renovate will create a subdirectory within baseDir to use.">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'dockerMapDotfiles')">
+            <mat-icon class="tooltip" matTooltip="Map relevant home directory dotfiles into containers when binarySource=docker. This is used if you want to map 'dotfiles' from your host computer home directory to containers that Renovate creates, e.g. for updating lock files. Currently applicable to .npmrc only.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.dockerMapDotfiles"
+            [disabled]="disabled"
+            name="dockerMapDotfiles">
+            dockerMapDotfiles
+          </mat-checkbox>
+        </div>
+    
+      </div>
+    </div>
+
+    <div class="group">
+      <mat-toolbar color="primary">Logger</mat-toolbar>
+      <div class="form-field-group">
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="logFile"
+            [(ngModel)]="config.logFile"
+            name="logFile">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'logFile')">
+            <mat-icon class="tooltip" matTooltip="Log file path">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-select
+            placeholder="logFileLevel"
+            [(ngModel)]="config.logFileLevel"
+            name="logFileLevel">
+            <mat-option>
+              default
+            </mat-option>
+            <mat-option value="fatal">
+              fatal
+            </mat-option>
+            <mat-option value="error">
+              error
+            </mat-option>
+            <mat-option value="warn">
+              warn
+            </mat-option>
+            <mat-option value="info">
+              info
+            </mat-option>
+            <mat-option value="debug">
+              debug
+            </mat-option>
+            <mat-option value="trace">
+              trace
+            </mat-option>
+          </mat-select>
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'logFileLevel')">
+            <mat-icon class="tooltip" matTooltip="Log file log level">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <mat-select
+            placeholder="logLevel"
+            [(ngModel)]="config.logLevel"
+            name="logLevel">
+            <mat-option>
+              default
+            </mat-option>
+            <mat-option value="fatal">
+              fatal
+            </mat-option>
+            <mat-option value="error">
+              error
+            </mat-option>
+            <mat-option value="warn">
+              warn
+            </mat-option>
+            <mat-option value="info">
+              info
+            </mat-option>
+            <mat-option value="debug">
+              debug
+            </mat-option>
+            <mat-option value="trace">
+              trace
+            </mat-option>
+          </mat-select>
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'logLevel')">
+            <mat-icon class="tooltip" matTooltip="Logging level">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+      </div>
+    </div>
+
+
+    <div class="group">
+      <mat-toolbar color="primary">Repository</mat-toolbar>
+      <div class="form-field-group">
+
+        
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'autodiscover')">
+            <mat-icon class="tooltip" matTooltip="Autodiscover all repositories. Be cautious when using this option - it will run Renovate over every repository that the bot account has access to. To filter this list, use autodiscoverFilter.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.autodiscover"
+            [disabled]="disabled"
+            name="autodiscover">
+              autodiscover
+          </mat-checkbox>
+        </div>
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="autodiscoverFilter"
+            [(ngModel)]="config.autodiscoverFilter"
+            name="autodiscoverFilter">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'autodiscoverFilter')">
+            <mat-icon class="tooltip" matTooltip="Filter the list of autodiscovered repositories. A minimatch glob-style pattern for filtering autodiscovered repositories. Ex: project/*">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="gitPrivateKey"
+            [(ngModel)]="config.gitPrivateKey"
+            name="gitPrivateKey">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'gitPrivateKey')">
+            <mat-icon class="tooltip" matTooltip="PGP key to use for signing git commits.">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        <app-array-form
+          title="repositories"
+          [(ngModel)]="config.repositories"
+          name="repositories">
+        </app-array-form>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'requireConfig')">
+            <mat-icon class="tooltip" matTooltip="Set to true if repositories must have a config to activate.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.requireConfig"
+            [disabled]="disabled"
+            name="requireConfig">
+            requireConfig
+          </mat-checkbox>
+        </div>
+
+        <mat-form-field class="full-width">
+          <mat-select
+            placeholder="trustLevel"
+            [(ngModel)]="config.trustLevel"
+            name="trustLevel">
+            <mat-option>
+              default
+            </mat-option>
+            <mat-option value="low">
+              low
+            </mat-option>
+            <mat-option value="high">
+              high
+            </mat-option>
+          </mat-select>
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'trustLevel')">
+            <mat-icon class="tooltip" matTooltip="Set this to 'high' if the bot should trust the repository owners/contents">help</mat-icon>
+          </a>
+        </mat-form-field>
+        
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'persistRepoData')">
+            <mat-icon class="tooltip" matTooltip="If set to false, repository data will preserved between runs instead of deleted.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.persistRepoData"
+            [disabled]="disabled"
+            name="persistRepoData">
+            persistRepoData
+          </mat-checkbox>
+        </div>
+      
+      </div>
+    </div>
+
+
+    <div class="group">
+      <mat-toolbar color="primary">Environment</mat-toolbar>
+      <div class="form-field-group">
+
+          <div class="full-width checkbox">
+            <a matSuffix (click)="openDialog('self-hosted-configuration', 'onboarding')">
+              <mat-icon class="tooltip" matTooltip="Require a Configuration PR first. Set this to false if (a) you configure Renovate entirely on the bot side (i.e. empty renovate.json in repositories) and (b) you wish to run Renovate on every repository the bot has access to, and (c) you wish to skip the onboarding PRs.">help</mat-icon>
+            </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.onboarding"
+            [disabled]="disabled"
+            name="onboarding">
+              Onboarding
+          </mat-checkbox>
+        </div>
+
+        <mat-accordion *ngIf="config.onboarding">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <a (click)="openDialog('configuration-options', '')">
+                onboardingConfig <mat-icon class="tooltip" matTooltip="Configuration to use in onboarding PRs">help</mat-icon>
+              </a>
+            </mat-expansion-panel-header>
+
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  Automerge <mat-icon class="tooltip" matTooltip="Automerge configuration">help</mat-icon>
+                </mat-expansion-panel-header>
+      
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'assignautomerge')">
+                    <mat-icon class="tooltip" matTooltip="Assign reviewers and assignees even if the PR is to be automerged. By default, Renovate will not assign reviewers and assignees if the PR is to be automerged, unless the status check failed. By configuring this setting, you can enable Renovate to always assign reviewers and assignees.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.assignAutomerge"
+                    [disabled]="disabled"
+                    name="assignAutomerge">
+                    assignAutomerge
+                  </mat-checkbox>
+                </div>
+
+                <app-array-form
+                  title="assignees"
+                  [(ngModel)]="config.onboardingConfig.assignees"
+                  name="assignees">
+                </app-array-form>
+            
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'automerge')">
+                    <mat-icon class="tooltip" matTooltip="Whether to automerge branches/PRs automatically, without human intervention. By default, Renovate raises PRs but leaves them to someone/something else to merge them. By configuring this setting, you can enable Renovate to automerge branches or PRs itself, therefore reducing the amount of human intervention required.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.automerge"
+                    [disabled]="disabled"
+                    name="automerge">
+                    automerge
+                  </mat-checkbox>
+                </div>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="automergeComment"
+                    [(ngModel)]="config.onboardingConfig.automergeComment"
+                    name="automergeComment">
+                  <a matSuffix (click)="openDialog('configuration-options', 'automergeComment')">
+                    <mat-icon class="tooltip" matTooltip="PR comment to add to trigger automerge. Used only if automergeType=pr-comment.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="automergeType"
+                    [(ngModel)]="config.onboardingConfig.automergeType"
+                    name="automergeType">
+                  <a matSuffix (click)="openDialog('configuration-options', 'automergeType')">
+                    <mat-icon class="tooltip" matTooltip="How to automerge, if enabled. This setting is only applicable if you opt in to set automerge to true for any of your dependencies.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Branch <mat-icon class="tooltip" matTooltip="Branch configuration">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <app-array-form
+                  title="baseBranches"
+                  [(ngModel)]="config.onboardingConfig.baseBranches"
+                  name="baseBranches">
+                </app-array-form>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="branchPrefix"
+                    [(ngModel)]="config.onboardingConfig.branchPrefix"
+                    name="branchPrefix">
+                  <a matSuffix (click)="openDialog('configuration-options', 'branchPrefix')">
+                    <mat-icon class="tooltip" matTooltip="Prefix to use for all branch names. You can modify this field if you want to change the prefix used.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="branchTopic"
+                    [(ngModel)]="config.onboardingConfig.branchTopic"
+                    name="branchTopic">
+                  <a matSuffix (click)="openDialog('configuration-options', 'branchTopic')">
+                    <mat-icon class="tooltip" matTooltip="Branch topic. This field is combined with branchPrefix and managerBranchPrefix to form the full branchName. branchName uniqueness is important for dependency update grouping or non-grouping so be cautious about ever editing this field manually.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <mat-form-field class="full-width">
+              <mat-select
+                placeholder="bumpVersion"
+                [(ngModel)]="config.onboardingConfig.bumpVersion"
+                name="bumpVersion">
+                <mat-option>
+                  default
+                </mat-option>
+                <mat-option value="major">
+                  major
+                </mat-option>
+                <mat-option value="minor">
+                  minor
+                </mat-option>
+                <mat-option value="patch">
+                  patch
+                </mat-option>
+              </mat-select>
+              <a matSuffix (click)="openDialog('configuration-options', 'bumpVersion')">
+                <mat-icon class="tooltip" matTooltip="Bump the version in the package.json being updated. Set this value to 'patch', 'minor' or 'major' to have Renovate update the version in your edited package.json. e.g. if you wish Renovate to always increase the target package.json version with a patch update, set this to 'patch'. You can also set this field to 'mirror:x' where x is the name of a package in the package.json. Doing so means that the package.json version field will mirror whatever the version is that x depended on. Make sure that version is a pinned version of course, as otherwise it won't be valid.">help</mat-icon>
+              </a>
+            </mat-form-field>
+                      
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Commit <mat-icon class="tooltip" matTooltip="Configuration of commit body and message">help</mat-icon>
+                </mat-expansion-panel-header>
+      
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitBody"
+                    [(ngModel)]="config.onboardingConfig.commitBody"
+                    name="commitBody">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitBody')">
+                    <mat-icon class="tooltip" matTooltip="Commit message body template. Will be appended to commit message, separated by two line returns. This is used whenever a commit 'body' is needed, e.g. for adding [skip ci] or DCO signoff.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitBodyTable')">
+                    <mat-icon class="tooltip" matTooltip="If enabled, append a table in the commit message body describing all updates in the commit">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.commitBodyTable"
+                    [disabled]="disabled"
+                    name="commitBodyTable">
+                    commitBodyTable
+                  </mat-checkbox>
+                </div>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessage"
+                    [(ngModel)]="config.onboardingConfig.commitMessage"
+                    name="commitMessage">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessage')">
+                    <mat-icon class="tooltip" matTooltip="Message to use for commit messages and pull request titles. Editing of commitMessage directly is now deprecated and not recommended. Please instead edit the fields such as commitMessageAction, commitMessageExtra, etc.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessageAction"
+                    [(ngModel)]="config.onboardingConfig.commitMessageAction"
+                    name="commitMessageAction">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessageAction')">
+                    <mat-icon class="tooltip" matTooltip="Action verb to use in commit messages and PR titles. This is used to alter commitMessage and prTitle without needing to copy/paste the whole string. Actions may be like Update, Pin, Roll back, Refresh, etc.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessageExtra"
+                    [(ngModel)]="config.onboardingConfig.commitMessageExtra"
+                    name="commitMessageExtra">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessageExtra')">
+                    <mat-icon class="tooltip" matTooltip="Extra description used after the commit message topic - typically the version. This is used to alter commitMessage and prTitle without needing to copy/paste the whole string. The 'extra' is usually an identifier of the new version, e.g. 'to v1.3.2' or 'to tag 9.2'.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessagePrefix"
+                    [(ngModel)]="config.onboardingConfig.commitMessagePrefix"
+                    name="commitMessagePrefix">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessagePrefix')">
+                    <mat-icon class="tooltip" matTooltip="Prefix to add to start of commit messages and PR titles. Uses a semantic prefix if semanticCommits enabled. This is used to alter commitMessage and prTitle without needing to copy/paste the whole string. The 'prefix' is usually an automatically applied semantic commit prefix, however it can also be statically configured.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessageSuffix"
+                    [(ngModel)]="config.onboardingConfig.commitMessageSuffix"
+                    name="commitMessageSuffix">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessageSuffix')">
+                    <mat-icon class="tooltip" matTooltip="Suffix to add to end of commit messages and PR titles. This is used to add a suffix to commit messages. Usually left empty except for internal use (multiple base branches, and vulnerability alerts).">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                    
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="commitMessageTopic"
+                    [(ngModel)]="config.onboardingConfig.commitMessageTopic"
+                    name="commitMessageTopic">
+                  <a matSuffix (click)="openDialog('configuration-options', 'commitMessageTopic')">
+                    <mat-icon class="tooltip" matTooltip="The upgrade topic/noun used in commit messages and PR titles. This is used to alter commitMessage and prTitle without needing to copy/paste the whole string. The 'topic' is usually refers to the dependency being updated, e.g. 'dependency react'.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+            
+              </mat-expansion-panel>
+            </mat-accordion>
+        
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'configWarningReuseIssue')">
+                <mat-icon class="tooltip" matTooltip="Set this to false and Renovate will open each config warning in a new issue instead of reopening/reusing an existing issue. Set this option to false if you prefer Renovate to open a new issue whenever there is config warning.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.configWarningReuseIssue"
+                [disabled]="disabled"
+                name="configWarningReuseIssue">
+                configWarningReuseIssue
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="description"
+              [(ngModel)]="config.onboardingConfig.description"
+              name="description">
+            </app-array-form>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'enabled')">
+                <mat-icon class="tooltip" matTooltip="Enable or disable Renovate">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.enabled"
+                [disabled]="disabled"
+                name="enabled">
+                enabled
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="enabledManagers"
+              [(ngModel)]="config.onboardingConfig.enabledManagers"
+              name="enabledManagers">
+            </app-array-form>
+
+            <app-array-form
+              title="excludeCommitPaths"
+              [(ngModel)]="config.onboardingConfig.excludeCommitPaths"
+              name="excludeCommitPaths">
+            </app-array-form>
+
+            <app-array-form
+              title="extends"
+              [(ngModel)]="config.onboardingConfig.extends"
+              name="extends">
+            </app-array-form>
+
+            <app-array-form
+              title="fileMatch"
+              [(ngModel)]="config.onboardingConfig.fileMatch"
+              name="fileMatch">
+            </app-array-form>
+                
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="groupName"
+                [(ngModel)]="config.onboardingConfig.groupName"
+                name="groupName">
+              <a matSuffix (click)="openDialog('configuration-options', 'groupName')">
+                <mat-icon class="tooltip" matTooltip="Human understandable name for the dependency group">help</mat-icon>
+              </a>
+            </mat-form-field>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Ignores <mat-icon class="tooltip" matTooltip="Preferences for ignoring">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'ignoreDeprecated')">
+                    <mat-icon class="tooltip" matTooltip="Ignore deprecated versions unless the current version is deprecated.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.ignoreDeprecated"
+                    [disabled]="disabled"
+                    name="ignoreDeprecated">
+                    ignoreDeprecated
+                  </mat-checkbox>
+                </div>
+
+                <app-array-form
+                  title="ignoreDeps"
+                  [(ngModel)]="config.onboardingConfig.ignoreDeps"
+                  name="ignoreDeps">
+                </app-array-form>
+            
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'ignoreNpmrcFile')">
+                    <mat-icon class="tooltip" matTooltip="Whether to ignore any .npmrc file found in repository.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.ignoreNpmrcFile"
+                    [disabled]="disabled"
+                    name="ignoreNpmrcFile">
+                    ignoreNpmrcFile
+                  </mat-checkbox>
+                </div>
+
+                <app-array-form
+                  title="ignorePaths"
+                  [(ngModel)]="config.onboardingConfig.ignorePaths"
+                  name="ignorePaths">
+                </app-array-form>
+
+                <app-array-form
+                  title="ignorePresets"
+                  [(ngModel)]="config.onboardingConfig.ignorePresets"
+                  name="ignorePresets">
+                </app-array-form>
+            
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'ignoreUnstable')">
+                    <mat-icon class="tooltip" matTooltip="Ignore versions with unstable semver.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.ignoreUnstable"
+                    [disabled]="disabled"
+                    name="ignoreUnstable">
+                    ignoreUnstable
+                  </mat-checkbox>
+                </div>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Includes <mat-icon class="tooltip" matTooltip="Preferences for including">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'includeForks')">
+                    <mat-icon class="tooltip" matTooltip="Whether to process forked repositories or not. By default, all forked repositories are skipped over.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.includeForks"
+                    [disabled]="disabled"
+                    name="includeForks">
+                    includeForks
+                  </mat-checkbox>
+                </div>
+
+                <app-array-form
+                  title="includePaths"
+                  [(ngModel)]="config.onboardingConfig.includePaths"
+                  name="includePaths">
+                </app-array-form>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <app-array-form
+              title="labels"
+              [(ngModel)]="config.onboardingConfig.labels"
+              name="labels">
+            </app-array-form>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'lazyGrouping')">
+                <mat-icon class="tooltip" matTooltip="Use group names only when multiple dependencies upgraded.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.lazyGrouping"
+                [disabled]="disabled"
+                name="lazyGrouping">
+                lazyGrouping
+              </mat-checkbox>
+            </div>
+        
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="managerBranchPrefix"
+                [(ngModel)]="config.onboardingConfig.managerBranchPrefix"
+                name="managerBranchPrefix">
+              <a matSuffix (click)="openDialog('configuration-options', 'managerBranchPrefix')">
+                <mat-icon class="tooltip" matTooltip="Branch manager prefix. This value defaults to empty string, as historically no prefix was necessary for when Renovate was JS-only. Now - for example - we use docker- for Docker branches, so they may look like renovate/docker-ubuntu-16.x.">help</mat-icon>
+              </a>
+            </mat-form-field>
+        
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="npmrc"
+                [(ngModel)]="config.onboardingConfig.npmrc"
+                name="npmrc">
+              <a matSuffix (click)="openDialog('configuration-options', 'npmrc')">
+                <mat-icon class="tooltip" matTooltip="String copy of npmrc file. Use \n instead of line breaks. See https://docs.renovatebot.com/private-modules for details on how this is used.">help</mat-icon>
+              </a>
+            </mat-form-field>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Includes <mat-icon class="tooltip" matTooltip="Preferences for including">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'masterIssue')">
+                    <mat-icon class="tooltip" matTooltip="Whether to create a 'Master Issue' within the repository. Configuration masterIssue to true will lead to the creation of a 'Master Issue' within the repository. This Master Issue is akin to a mini dashboard and contains a list of all PRs pending, open, closed (unmerged) or in error.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.masterIssue"
+                    [disabled]="disabled"
+                    name="masterIssue">
+                    masterIssue
+                  </mat-checkbox>
+                </div>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'masterIssueApproval')">
+                    <mat-icon class="tooltip" matTooltip="Whether updates should require manual approval from within the Master Issue before creation. Setting masterIssueApproval to true means that Renovate will no longer create branches/PRs automatically but instead wait for manual approval from within the Master Issue.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.masterIssueApproval"
+                    [disabled]="disabled"
+                    name="masterIssueApproval">
+                    masterIssueApproval
+                  </mat-checkbox>
+                </div>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'masterIssueAutoclose')">
+                    <mat-icon class="tooltip" matTooltip="Set to true and Renovate will autoclose the Master Issue if there are no updates. You can set this to true if you prefer Renovate to autoclose its Master Issue whenever there are no outstanding PRs left.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.masterIssueAutoclose"
+                    [disabled]="disabled"
+                    name="masterIssueAutoclose">
+                    masterIssueAutoclose
+                  </mat-checkbox>
+                </div>
+            
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="masterIssueTitle"
+                    [(ngModel)]="config.onboardingConfig.masterIssueTitle"
+                    name="masterIssueTitle">
+                  <a matSuffix (click)="openDialog('configuration-options', 'masterIssueTitle')">
+                    <mat-icon class="tooltip" matTooltip="Title to use for the Master Issue. Set this option if you prefer a different title for the Master Issue.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+                
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <app-array-form
+              title="postUpdateOptions"
+              [(ngModel)]="config.onboardingConfig.postUpdateOptions"
+              name="postUpdateOptions">
+            </app-array-form>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Pull Request <mat-icon class="tooltip" matTooltip="Preferences for including">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <app-array-form
+                  title="prBodyColumns"
+                  [(ngModel)]="config.onboardingConfig.prBodyColumns"
+                  name="prBodyColumns">
+                </app-array-form>
+
+                <app-array-form
+                  title="prBodyNotes"
+                  [(ngModel)]="config.onboardingConfig.prBodyNotes"
+                  name="prBodyNotes">
+                </app-array-form>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prConcurrentLimit"
+                    [(ngModel)]="config.onboardingConfig.prConcurrentLimit"
+                    name="prConcurrentLimit"
+                    type="number">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prConcurrentLimit')">
+                    <mat-icon class="tooltip" matTooltip="Limit to a maximum of x concurrent branches/PRs. 0 (default) means no limit.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prCreation"
+                    [(ngModel)]="config.onboardingConfig.prCreation"
+                    name="prCreation"
+                    type="number">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prCreation')">
+                    <mat-icon class="tooltip" matTooltip="When to create the PR for a branch. This setting tells Renovate when you would like it to raise PRs: immediate, not-pending, status-success.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prHourlyLimit"
+                    [(ngModel)]="config.onboardingConfig.prHourlyLimit"
+                    name="prHourlyLimit"
+                    type="number">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prHourlyLimit')">
+                    <mat-icon class="tooltip" matTooltip="Rate limit PRs to maximum x created per hour. 0 (default) means no limit.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prNotPendingHours"
+                    [(ngModel)]="config.onboardingConfig.prNotPendingHours"
+                    name="prNotPendingHours"
+                    type="number">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prNotPendingHours')">
+                    <mat-icon class="tooltip" matTooltip="Timeout in hours for when prCreation=not-pending. f you set prCreation=not-pending, then Renovate will wait until tests are non-pending (all pass or at least one fails) before creating PRs. However there are cases where PRs may remain in pending state forever, e.g. absence of tests or status checks that are set to pending indefinitely. Therefore we set an upper limit - default 24 hours - for how long we wait until creating a PR. Note also this is the same length of time as for Renovate's own unpublishSafe status check for npm.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prPriority"
+                    [(ngModel)]="config.onboardingConfig.prPriority"
+                    name="prPriority"
+                    type="number">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prPriority')">
+                    <mat-icon class="tooltip" matTooltip="Set sorting priority for PR creation. PRs with higher priority are created first, negative priority last. Sometimes Renovate needs to rate limit its creation of PRs, e.g. hourly or concurrent PR limits. In such cases it sorts/prioritizes by default based on the update type (e.g. patches raised before minor, minor before major). If you have dependencies that are more or less important than others then you can use the prPriority field for PR sorting. The default value is 0, so therefore setting a negative value will make dependencies sort last, while higher values sort first.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="prTitle"
+                    [(ngModel)]="config.onboardingConfig.prTitle"
+                    name="prTitle">
+                  <a matSuffix (click)="openDialog('configuration-options', 'prTitle')">
+                    <mat-icon class="tooltip" matTooltip="Pull Request title template (deprecated). Now uses commitMessage. The PR title is important for some of Renovate's matching algorithms (e.g. determining whether to recreate a PR or not) so ideally don't modify it much.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+        
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'pruneStaleBranches')">
+                <mat-icon class="tooltip" matTooltip="Enable or disable pruning of stale branches. Set to false to disable deleting orphan branches and autoclosing PRs. Defaults to true.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.pruneStaleBranches"
+                [disabled]="disabled"
+                name="pruneStaleBranches">
+                pruneStaleBranches
+              </mat-checkbox>
+            </div>
+
+            <mat-form-field class="full-width">
+                <mat-select
+                  placeholder="rangeStrategy"
+                  [(ngModel)]="config.rangeStrategy"
+                  name="rangeStrategy">
+                  <mat-option>
+                    default
+                  </mat-option>
+                  <mat-option value="auto">
+                    auto
+                  </mat-option>
+                  <mat-option value="pin">
+                    pin
+                  </mat-option>
+                  <mat-option value="bump">
+                    bump
+                  </mat-option>
+                  <mat-option value="replace">
+                    replace
+                  </mat-option>
+                  <mat-option value="widen">
+                    widen
+                  </mat-option>
+                  <mat-option value="update-lockfile">
+                    update-lockfile
+                  </mat-option>
+                </mat-select>
+                <a matSuffix (click)="openDialog('configuration-options', 'rangeStrategy')">
+                  <mat-icon class="tooltip" matTooltip="Policy for how to modify/update existing ranges.">help</mat-icon>
+                </a>
+              </mat-form-field>  
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Rebase <mat-icon class="tooltip" matTooltip="Preferences for rebasing">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'rebaseConflictedPrs')">
+                    <mat-icon class="tooltip" matTooltip="Auto-rebase when there is conflict in PRs. This field defaults to true which means Renovate will rebase whenever there is a merge conflict with the master branch. However, this default behavior may result in costing a lot of CI cycles. If you wish to disable auto-rebasing in case of merge conflicts with the master branch, set it's value to false.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.rebaseConflictedPrs"
+                    [disabled]="disabled"
+                    name="rebaseConflictedPrs">
+                    rebaseConflictedPrs
+                  </mat-checkbox>
+                </div>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="rebaseLabel"
+                    [(ngModel)]="config.onboardingConfig.rebaseLabel"
+                    name="rebaseLabel">
+                  <a matSuffix (click)="openDialog('configuration-options', 'rebaseLabel')">
+                    <mat-icon class="tooltip" matTooltip="Label to use to request the bot to rebase a PR manually. On GitHub it is possible to add a label to a PR to manually request Renovate to recreate/rebase it. By default this label is 'rebase' however you can configure it to anything you want by changing this rebaseLabel field.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+            
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'rebaseStalePrs')">
+                    <mat-icon class="tooltip" matTooltip="Rebase any PRs that are not up-to-date with the base branch. This field defaults to null because it has the potential to create a lot of noise and additional builds to your repository. If you enable it to true, it means each Renovate branch will be updated whenever the base branch has changed.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.rebaseStalePrs"
+                    [disabled]="disabled"
+                    name="rebaseStalePrs">
+                    rebaseStalePrs
+                  </mat-checkbox>
+                </div>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'recreateClosed')">
+                <mat-icon class="tooltip" matTooltip="Recreate PRs even if same ones were closed previously. By default, Renovate will detect if it has proposed an update to a project before and not propose the same one again. For example the Webpack 3.x case described above. This field lets you customise this behaviour down to a per-package level. For example we override it to true in the following cases where branch names and PR titles need to be reused: Package groups, When pinning versions, Lock file maintenance. Typically you shouldn't need to modify this setting.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.recreateClosed"
+                [disabled]="disabled"
+                name="recreateClosed">
+                recreateClosed
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="registryUrls"
+              [(ngModel)]="config.onboardingConfig.registryUrls"
+              name="registryUrls">
+            </app-array-form>
+
+            <app-array-form
+              title="requiredStatusChecks"
+              [(ngModel)]="config.onboardingConfig.requiredStatusChecks"
+              name="requiredStatusChecks">
+            </app-array-form>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'respectLatest')">
+                <mat-icon class="tooltip" matTooltip="Ignore versions newer than npm 'latest' version. Similar to ignoreUnstable, this option controls whether to update to versions that are greater than the version tagged as latest in the repository. By default, renovate will update to a version greater than latest only if the current version is itself past latest.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.respectLatest"
+                [disabled]="disabled"
+                name="respectLatest">
+                respectLatest
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="reviewers"
+              [(ngModel)]="config.onboardingConfig.reviewers"
+              name="reviewers">
+            </app-array-form>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'rollbackPrs')">
+                <mat-icon class="tooltip" matTooltip="Create PRs to roll back versions if the current version is not found in the registry. Set this to false either globally, per-language, or per-package if you want to disable Renovate's behaviour of generating rollback PRs when it can't find the current version on the registry anymore.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.rollbackPrs"
+                [disabled]="disabled"
+                name="rollbackPrs">
+                rollbackPrs
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="schedule"
+              [(ngModel)]="config.onboardingConfig.schedule"
+              name="schedule">
+            </app-array-form>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Semantic commit <mat-icon class="tooltip" matTooltip="Preferences for semantic commits">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="semanticCommitScope"
+                    [(ngModel)]="config.onboardingConfig.semanticCommitScope"
+                    name="semanticCommitScope">
+                  <a matSuffix (click)="openDialog('configuration-options', 'semanticCommitScope')">
+                    <mat-icon class="tooltip" matTooltip="Commit scope to use if semantic commits are enabled. By default you will see angular-style commit prefixes like 'chore(deps):'. If you wish to change it to something else like 'package' then it will look like 'chore(package):'. You can also use parentDir or baseDir to namespace your commits for monorepos e.g. '\{\{parentDir\}\}''.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <mat-form-field class="full-width">
+                  <input matInput
+                    placeholder="semanticCommitType"
+                    [(ngModel)]="config.onboardingConfig.semanticCommitType"
+                    name="semanticCommitType">
+                  <a matSuffix (click)="openDialog('configuration-options', 'semanticCommitType')">
+                    <mat-icon class="tooltip" matTooltip="Commit type to use if semantic commits is enabled. By default you will see angular-style commit prefixes like 'chore(deps):'. If you wish to change it to something else like 'ci' then it will look like 'ci(deps):'.">help</mat-icon>
+                  </a>
+                </mat-form-field>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'semanticCommits')">
+                    <mat-icon class="tooltip" matTooltip="Enable semantic commit prefixes for commits and PR titles.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.semanticCommits"
+                    [disabled]="disabled"
+                    name="semanticCommits">
+                    semanticCommits
+                  </mat-checkbox>
+                </div>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+                
+            <mat-accordion>
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    Seperate <mat-icon class="tooltip" matTooltip="Preferences for seperating">help</mat-icon>
+                </mat-expansion-panel-header>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'separateMajorMinor')">
+                    <mat-icon class="tooltip" matTooltip="If set to false, it will upgrade dependencies to latest release only, and not separate major/minor branches.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.separateMajorMinor"
+                    [disabled]="disabled"
+                    name="separateMajorMinor">
+                    separateMajorMinor
+                  </mat-checkbox>
+                </div>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'separateMinorPatch')">
+                    <mat-icon class="tooltip" matTooltip="If set to true, it will separate minor and patch updates into separate branches.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.separateMinorPatch"
+                    [disabled]="disabled"
+                    name="separateMinorPatch">
+                    separateMinorPatch
+                  </mat-checkbox>
+                </div>
+
+                <div class="full-width checkbox">
+                  <a matSuffix (click)="openDialog('configuration-options', 'separateMultipleMajor')">
+                    <mat-icon class="tooltip" matTooltip="If set to true, PRs will be raised separately for each available major upgrade version.">help</mat-icon>
+                  </a>
+                  <mat-checkbox
+                    labelPosition="before"
+                    [(ngModel)]="config.onboardingConfig.separateMultipleMajor"
+                    [disabled]="disabled"
+                    name="separateMultipleMajor">
+                    separateMultipleMajor
+                  </mat-checkbox>
+                </div>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="stabilityDays"
+                [(ngModel)]="config.onboardingConfig.stabilityDays"
+                name="stabilityDays"
+                type="number">
+              <a matSuffix (click)="openDialog('configuration-options', 'stabilityDays')">
+                <mat-icon class="tooltip" matTooltip="Number of days required before a new release is considered to be stabilized.">help</mat-icon>
+              </a>
+            </mat-form-field>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'statusCheckVerify')">
+                <mat-icon class="tooltip" matTooltip="Set a verify status check for all PRs. This feature is added for people migrating from alternative services who are used to seeing a 'verify' status check on PRs. If you'd like to use this then go ahead, but otherwise it's more secure to look for Renovate's GPG Verified Commits instead, because those cannot be spoofed by any other person or service (unlike status checks).">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.statusCheckVerify"
+                [disabled]="disabled"
+                name="statusCheckVerify">
+                statusCheckVerify
+              </mat-checkbox>
+            </div>
+
+            <app-array-form
+              title="supportPolicy"
+              [(ngModel)]="config.onboardingConfig.supportPolicy"
+              name="supportPolicy">
+            </app-array-form>
+
+            <app-array-form
+              title="suppressNotifications"
+              [(ngModel)]="config.onboardingConfig.suppressNotifications"
+              name="suppressNotifications">
+            </app-array-form>
+
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="timezone"
+                [(ngModel)]="config.onboardingConfig.timezone"
+                name="timezone">
+                <a matSuffix (click)="openDialog('configuration-options', 'timezone')">
+              <mat-icon class="tooltip" matTooltip="IANA Time Zone. It is only recommended to set this field if you wish to use the schedules feature and want to write them in your local timezone. Please see the above link for valid timezone names.">help</mat-icon>
+              </a>
+            </mat-form-field>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'unpublishSafe')">
+                <mat-icon class="tooltip" matTooltip="Set a status check for unpublish-safe upgrades. Enabling unpublishSafe will add a renovate/unpublish-safe status check with value pending to every branch to warn you about this possibility. It can be handy when used with the prCreation = not-pending configuration option - that way you won't get the PR raised until after a patch is 24 hours old or more.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.unpublishSafe"
+                [disabled]="disabled"
+                name="unpublishSafe">
+                unpublishSafe
+              </mat-checkbox>
+            </div>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'updateLockFiles')">
+                <mat-icon class="tooltip" matTooltip="Set to false to disable lock file updating.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.updateLockFiles"
+                [disabled]="disabled"
+                name="updateLockFiles">
+                updateLockFiles
+              </mat-checkbox>
+            </div>
+
+            <div class="full-width checkbox">
+              <a matSuffix (click)="openDialog('configuration-options', 'updateNotScheduled')">
+                <mat-icon class="tooltip" matTooltip="Whether to update (but not create) branches when not scheduled.">help</mat-icon>
+              </a>
+              <mat-checkbox
+                labelPosition="before"
+                [(ngModel)]="config.onboardingConfig.updateNotScheduled"
+                [disabled]="disabled"
+                name="updateNotScheduled">
+                updateNotScheduled
+              </mat-checkbox>
+            </div>
+
+            <mat-form-field class="full-width">
+              <input matInput
+                placeholder="versionScheme"
+                [(ngModel)]="config.onboardingConfig.versionScheme"
+                name="versionScheme">
+              <a matSuffix (click)="openDialog('configuration-options', 'versionScheme')">
+                <mat-icon class="tooltip" matTooltip="Version scheme to use for filtering and comparisons.">help</mat-icon>
+              </a>
+            </mat-form-field>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'optimizeForDisabled')">
+            <mat-icon class="tooltip" matTooltip="Set to true to first check for disabling in config before cloning.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.optimizeForDisabled"
+            [disabled]="disabled"
+            name="optimizeForDisabled">
+            optimizeForDisabled
+          </mat-checkbox>
+        </div>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'skipInstalls')">
+            <mat-icon class="tooltip" matTooltip="Skip installing modules/dependencies if lock file updating is possible alone">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.skipInstalls"
+            [disabled]="disabled"
+            name="skipInstalls">
+            skipInstalls
+          </mat-checkbox>
+        </div>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'force')">
+            <mat-icon class="tooltip" matTooltip="Set to true to force the configuration defined in onboardingConfig.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.force.forceEnabled"
+            [disabled]="disabled"
+            name="force">
+            Force
+          </mat-checkbox>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="group">
+      <mat-toolbar color="primary">Pull Requests</mat-toolbar>
+      <div class="form-field-group">
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'forkMode')">
+            <mat-icon class="tooltip" matTooltip="Set to true to fork the source repository and create branches there instead. You probably have no need for this option - it is an experimental setting for the Renovate hosted GitHub App.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.forkMode"
+            [disabled]="disabled"
+            name="forkMode">
+            forkMode
+          </mat-checkbox>
+        </div>
+
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="gitAuthor"
+            [(ngModel)]="config.gitAuthor"
+            name="gitAuthor">
+            <a matSuffix (click)="openDialog('self-hosted-configuration', 'gitAuthor')">
+              <mat-icon class="tooltip" matTooltip="Author to use for git commits. RFC5322">help</mat-icon>
+            </a>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+            <input matInput
+              placeholder="prFooter"
+              [(ngModel)]="config.prFooter"
+              name="prFooter">
+            <a matSuffix (click)="openDialog('self-hosted-configuration', 'prFooter')">
+              <mat-icon class="tooltip" matTooltip="Pull Request footer template">help</mat-icon>
+            </a>
+        </mat-form-field>
+      
+      </div>
+    </div>
+
+    <div class="group">
+      <mat-toolbar color="primary">Renovate exec</mat-toolbar>
+      <div class="form-field-group">
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'dryRun')">
+            <mat-icon class="tooltip" matTooltip="If enabled, perform a dry run by logging messages instead of creating/updating/deleting branches and PRs">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.dryRun"
+            [disabled]="disabled"
+            name="dryRun">
+            dryRun
+          </mat-checkbox>
+        </div>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'forceCli')">
+            <mat-icon class="tooltip" matTooltip="Whether CLI configuration options should be moved to the force config section. This is set to true by default, meaning that any settings (such as schedule) take maximum priority even against custom settings existing inside individual repositories. It will also override any settings in packageRules.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.forceCli"
+            [disabled]="disabled"
+            name="forceCli">
+            forceCli
+          </mat-checkbox>
+        </div>
+
+        <div class="full-width checkbox">
+          <a matSuffix (click)="openDialog('self-hosted-configuration', 'printConfig')">
+            <mat-icon class="tooltip" matTooltip="If enabled, log the full resolved config for each repo, including resolved presets.">help</mat-icon>
+          </a>
+          <mat-checkbox
+            labelPosition="before"
+            [(ngModel)]="config.printConfig"
+            [disabled]="disabled"
+            name="printConfig">
+            printConfig
+          </mat-checkbox>
+        </div>
+
+      </div>
+    </div>
+
+    
+    <button mat-raised-button color="primary" (click)="saveConfig()">
+      Save
+      <mat-icon>save</mat-icon>
+    </button>
+
+  </form>
+  
+  <div *ngIf="config">
+    <div style="display: flex; flex-flow: column nowrap; margin-top: 10%;">
+      <app-json-editor
+        [(ngModel)]="config">
+      </app-json-editor>
+
+      <button mat-raised-button color="primary" (click)="saveConfig()">
+        Save
+        <mat-icon>save</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>

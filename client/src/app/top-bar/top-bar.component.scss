@@ -1,0 +1,33 @@
+
+.top-bar {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  @media only screen and (max-width: 500px) {
+    flex-flow: column nowrap;
+    justify-content: center;
+  }
+  width: 100%;
+  min-height: 68px;
+  padding: 16px;
+  align-items: center;
+  height: fit-content;
+
+  a {
+    display: flex;
+    flex-flow: row nowrap;
+    text-align: center;
+    justify-content: space-evenly;
+    
+    h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    h1.hide {
+      @media only screen and (max-width: 230px) {
+        display: none;
+      }
+    }
+  }
+}

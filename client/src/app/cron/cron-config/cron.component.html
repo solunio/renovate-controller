@@ -1,0 +1,80 @@
+<app-page-actions>
+    <a mat-flat-button routerLink="/config">
+      <mat-icon>build</mat-icon>
+    </a>
+  </app-page-actions>
+  
+
+<div class="cron">
+  <div class="column">
+
+    <div class="cron-config">
+      <form class="form">
+    
+        <div class="heading1" style="height: inherit;">
+          <mat-icon>settingsapplications</mat-icon>
+          <h1>Cron configuration</h1>
+        </div>
+    
+        <mat-divider class="divide-header"></mat-divider>
+                
+        <mat-form-field class="full-width">
+          <input matInput
+            placeholder="cronTime"
+            [(ngModel)]="cronTime"
+            name="cronTime">
+          <a matSuffix (click)="openDialog('cron')">
+            <mat-icon class="tooltip" [matTooltip]="cronTooltip">help</mat-icon>
+          </a>
+        </mat-form-field>
+
+        
+        <button mat-raised-button color="primary" (click)="startStopCronJob()">
+          <span>{{cronRuns ? 'STOP' : 'START'}} CRON </span><mat-icon>{{cronRuns ? 'highlight_off' : 'schedule'}}</mat-icon>
+        </button>
+
+      </form>
+
+      <div class="status">
+        <div class="circle">
+          <div class="circletext mat-elevation-z5" [style.background-color]="cronRuns ? '#32cb00' : '#f44336'">CRON</div>
+        </div>
+        <div class="circle">
+          <div class="circletext mat-elevation-z5" [style.background-color]="renovateRuns ? '#32cb00' : '#f44336'">RENOVATE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="last-container hide-last-container" style="margin-bottom: 3%;"> 
+      <div class="imagecontainer">
+        <img
+          src="assets/renovate_controller_bot.png"
+          alt="robot"
+          class="image">
+      </div>
+    </div>
+    
+  </div>
+
+  <mat-divider class="hide-divider"></mat-divider>
+
+  <div class="column">
+
+    <form class="form">
+      <div class="heading1">
+        <mat-icon>notes</mat-icon>
+        <h1>Renovate output</h1>
+      </div>
+  
+      <mat-divider class="divide-header"></mat-divider>
+
+      <button mat-raised-button color="primary" (click)="clearRenovateOutput()">
+        <span>CLEAR </span><mat-icon>clear</mat-icon>
+      </button>
+    </form>
+      
+    <div class="last-container">
+      <pre><code>{{ renovateOutput }}</code></pre>
+    </div>
+  </div>
+</div>

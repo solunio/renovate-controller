@@ -1,0 +1,9 @@
+@import './top-bar/top-bar.theme.scss';
+@import './cron/cron.theme';
+@import './config/config.theme';
+
+@mixin app-theme($theme) {
+  @include top-bar-theme($theme);
+  @include cron-theme($theme);
+  @include config-theme($theme);
+}
