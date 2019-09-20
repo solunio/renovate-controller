@@ -1,10 +1,10 @@
 # RenovateController
 
-![](./client/src/assets/renovate_controller_bot.png "RenovateController")
-
 ## Intro
 RenovateController is a graphical user interface to configure, execute and observe the [Renovate Bot](https://renovatebot.com).
 You can use `docker` to start and run the whole project inside a node container. The execution of the renovate job itself is all based on a configurable cron job.
+
+![](./client/src/assets/renovate_controller_bot.png "RenovateController")
 
 ### Overview
 
